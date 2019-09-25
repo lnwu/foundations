@@ -4,7 +4,20 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint . --ext .ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "CI=true yarn test"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint --fix",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
