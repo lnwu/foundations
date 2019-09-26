@@ -1,17 +1,21 @@
 import {
   ErrorStack,
   parseMessageError,
-  ErrorStackType
+  ErrorStackType,
+  parseFileError
 } from "./helpers/stackDetailParseHelper"
-import { isMessageError } from "./helpers/stackTypeHelper"
+import { isMessageError, isFileError } from "./helpers/stackTypeHelper"
+import { mapFileError } from "./helpers/mapErrorHelper"
+
+export interface ErrorStackDto {
+  line: number
+  column: number
+  filename: string
+}
 
 export interface ErrorMessage {
   message: string
-  stack: Array<{
-    line: number
-    column: number
-    filename: string
-  }>
+  stack: ErrorStackDto[]
 }
 
 const splitErrorStack = (stack: string): ErrorStack[] => {
@@ -20,8 +24,14 @@ const splitErrorStack = (stack: string): ErrorStack[] => {
     if (isMessageError(stack)) {
       return parseMessageError(stack)
     }
+
+    if (isFileError(stack)) {
+      return parseFileError(stack)
+    }
+
+    return null
   })
-  return errorStacks
+  return errorStacks.filter(stack => !!stack)
 }
 
 export function parseError(error: Error): ErrorMessage {
@@ -33,9 +43,13 @@ export function parseError(error: Error): ErrorMessage {
     stack => stack.type === ErrorStackType.Message
   )
 
+  const fileErrorStacks = errorStacks
+    .filter(stack => stack.type === ErrorStackType.File)
+    .map(stack => mapFileError(stack))
+
   const errorInfo: ErrorMessage = {
     message: errorMessageStack ? errorMessageStack.message : "UNKNOWN",
-    stack: []
+    stack: fileErrorStacks
   }
 
   return errorInfo

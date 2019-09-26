@@ -24,3 +24,20 @@ export const parseMessageError = (message: string): ErrorStack => {
   }
   return errorDetail
 }
+
+export const parseFileError = (message: string): ErrorStack => {
+  const messageReg = /\/(\w+.js):(\d+):(\d+)$/
+  const regResult = messageReg.exec(message)
+  if (regResult) {
+    const [, filename, line, column] = regResult
+    const errorDetail: ErrorStack = {
+      type: ErrorStackType.File,
+      raw: message,
+      line: Number(line),
+      column: Number(column),
+      filename: filename
+    }
+    return errorDetail
+  }
+  return null
+}
