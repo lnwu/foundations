@@ -1,5 +1,7 @@
 ### foundations
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/lnwu/foundations.svg)](https://greenkeeper.io/)
+
 An error parser.
 
 ### CI
